@@ -1,28 +1,26 @@
+import os
 import requests
+from PIL import Image
 from aiogram import Bot, Dispatcher
 from aiogram.bot import bot
 from aiogram.utils import json, executor
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from telegraph import Telegraph
-from PIL import Image
-import array
-import validators
-import os
-
 from validators import url
 
-Tkn = open("tokens.txt")    #gets tokens from file
+Tkn = open("tokens.txt")  # gets tokens from file
 API_TOKEN = Tkn.readline()
 TELEGRAPH_TOKEN = Tkn.readline()
 Tkn.close()
 
-API_TOKEN = API_TOKEN[:-1]  #cuts space
-TELEGRAPH_TOKEN = TELEGRAPH_TOKEN[:-1]  #cuts space
+API_TOKEN = API_TOKEN[:-1]  # cuts space
+TELEGRAPH_TOKEN = TELEGRAPH_TOKEN[:-1]  # cuts space
 
-bot = Bot(token=API_TOKEN)  #bot init
+bot = Bot(token=API_TOKEN)  # bot init
 dp = Dispatcher(bot)
-telegraph = Telegraph(access_token=TELEGRAPH_TOKEN) #author init
+telegraph = Telegraph(access_token=TELEGRAPH_TOKEN)  # author init
+
 
 def delete_from_queue():
     file = open("queue.txt", "r")
@@ -36,8 +34,9 @@ def delete_from_queue():
         str = str + array[i] + "\n"
     file = open("queue.txt", "w")
     file.write(str)
-    #print(array)
+    # print(array)
     return
+
 
 def queue_num():
     file = open('queue.txt', 'r')
@@ -47,7 +46,8 @@ def queue_num():
 
     return num
 
-def telegraph_file_upload(path_to_file):    #uploads image on telegram server
+
+def telegraph_file_upload(path_to_file):  # uploads image on telegram server
     file_types = {'gif': 'image/gif', 'jpeg': 'image/jpeg', 'jpg': 'image/jpg', 'png': 'image/png', 'mp4': 'video/mp4'}
     file_ext = path_to_file.split('.')[-1]
     if file_ext in file_types:
@@ -62,6 +62,7 @@ def telegraph_file_upload(path_to_file):    #uploads image on telegram server
     telegraph_url = f'https://telegra.ph{telegraph_url}'
 
     return telegraph_url
+
 
 def link_processing(site, chat_id):
     driver = webdriver.Firefox()
@@ -117,47 +118,51 @@ def link_processing(site, chat_id):
     )
 
     link_to = 'https://telegra.ph/{}'.format(response['path'])
-    #bot.send_message(chat_id, link_to)
+    # bot.send_message(chat_id, link_to)
     print(link_to)
 
     driver.close()
 
     return link_to
 
-@dp.message_handler(content_types=['text']) #if bot gets text message
-async def start(message):
 
-    #queue to proceed
-    chat_id = message.from_user.id
-    #print("[", chat_id, "]==>", message.text)
-    q = open('queue.txt', 'a')  #overwriting chat id
-    q.write(str(chat_id) + '\n' + message.text + '\n')  #and link from user
-    q.close()   #file closed
+@dp.message_handler(content_types=['text'])  # if bot gets text message
+async def msg(message):
+    if message.text == '/start':
+        await bot.send_message(message.from_user.id,
+                               'Привет, пришли мне ссылку на 1 страницу главы манги с сайта mintmanga.live')
 
-    num = queue_num()
-    msg = 'Ваш номер в очереди: ' + str(int(num/2) - 1) + ', ожидайте!'
-    await bot.send_message(chat_id, msg)
-    print(msg)
-    q = open('queue.txt', 'r')  #read and proceed
-    while True:
-        st = q.readline()
-        st = st[:-1]
-        chat_id = st    #gets chat_id
+    else:
+        # queue to proceed
+        chat_id = message.from_user.id
+        # print("[", chat_id, "]==>", message.text)
+        q = open('queue.txt', 'a')  # overwriting chat id
+        q.write(str(chat_id) + '\n' + message.text + '\n')  # and link from user
+        q.close()  # file closed
 
-        st = q.readline()
-        st = st[:-1]
-        site = st   #gets site link
+        num = queue_num()
+        msg = 'Ваш номер в очереди: ' + str(int(num / 2) - 1) + ', ожидайте!'
+        await bot.send_message(chat_id, msg)
+        print(msg)
+        q = open('queue.txt', 'r')  # read and proceed
+        while True:
+            st = q.readline()
+            st = st[:-1]
+            chat_id = st  # gets chat_id
 
+            st = q.readline()
+            st = st[:-1]
+            site = st  # gets site link
 
-        if site != "":    #if not void
-            if url(site):
-                lnk = link_processing(site, chat_id)  #processing link
-                delete_from_queue()
-                await bot.send_message(chat_id, lnk)
+            if site != "":  # if not void
+                if url(site):
+                    lnk = link_processing(site, chat_id)  # processing link
+                    delete_from_queue()
+                    await bot.send_message(chat_id, lnk)
 
-        if not site:  #if void - break
-            break
-    q.close()
+            if not site:  # if void - break
+                break
+        q.close()
 
 
 if __name__ == '__main__':
