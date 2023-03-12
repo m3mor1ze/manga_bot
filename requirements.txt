@@ -1,0 +1,6 @@
+requests~=2.25.1
+Pillow~=9.0.1
+aiogram~=2.25.1
+selenium~=4.8.2
+telegraph~=2.2.0
+validators~=0.20.0
