@@ -1,3 +1,5 @@
+import asyncio
+
 from bs4 import BeautifulSoup
 import aiohttp
 from structures import MangaRaw
@@ -31,3 +33,13 @@ class MangaScrapper:
 
     def parse_picture_object_from_script(self, script: str) -> MangaRaw:
         return script
+
+async def example():
+    ms = MangaScrapper()
+    resp = await ms.get_manga_raw('/saga_o_vinlande__A35c96/vol1/1')
+    print(resp)
+    with open('parse_example.txt', 'w') as f:
+        f.write(resp)
+
+if __name__ == '__main__':
+    asyncio.run(example())
