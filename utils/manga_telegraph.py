@@ -10,7 +10,9 @@ class TelegraphForManga(Telegraph):
         super().__init__(access_token, domain)
         self.author = author
 
-    async def get_manga(self, manga: str | MangaRaw):
+    # TODO: логика на данном этапе неправильная.
+    #  нужно в статье хранить ссылку на оригинал манги. по ней и проводить сравнение
+    async def get_manga(self, manga: str | MangaRaw) -> Dict | None:
         """
         Finds a manga from existing pages
         :param manga:
@@ -19,7 +21,7 @@ class TelegraphForManga(Telegraph):
         page_list = await self.get_page_list()
         for page in page_list['pages']:
             if isinstance(manga, str) and page['title'] == manga:
-                return page['url']
+                return page
 
         return None
 
@@ -32,18 +34,21 @@ class TelegraphForManga(Telegraph):
         tagged_pics = [f'<img src={x.pic_url}>' for x in manga_raw.pics_raw]
         html = '\n'.join(tagged_pics)
 
-        resp = await self.create_page(
+        page = await self.create_page(
             title=manga_raw.name,
             html_content=html,
             author_name=self.author,
         )
-        return resp
+        return page
 
 
 async def example():
     t = TelegraphForManga(TELEGRAPH_TOKEN)
-    resp = await t.get_manga('qwe')
-    print(resp)
+    # print(resp)
+    #
+    # print('*' * 20)
+    # resp = await t.get_manga('qwe')
+
 
 
 if __name__ == '__main__':
