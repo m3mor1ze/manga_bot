@@ -5,7 +5,6 @@ from utils.manga_telegraph import TelegraphForManga
 
 class Supervisor:
     def __init__(self):
-        self.scrapper = MangaScrapper()
         self.poster = TelegraphForManga(
             author=TELEGRAPH_AUTHOR,
             access_token=TELEGRAPH_TOKEN
@@ -23,13 +22,11 @@ class Supervisor:
     # BOT USABLE API
     async def get_manga(self, msg):
         url = self._parse_url(msg)
-        print(f'processing: {url}')
-        name = await self.scrapper.get_manga_name(url)
-        manga = await self.poster.get_manga(name)
+        scrapper = await MangaScrapper(url)
+        manga = await self.poster.get_manga(scrapper.name)
 
         if manga is None:
             print('creating new post')
-            raw_manga = await self.scrapper.get_manga_raw(url)
-            manga = await self.poster.post_manga(raw_manga)
+            manga = await self.poster.post_manga(scrapper.manga_raw)
 
         return manga.get('url')
