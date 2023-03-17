@@ -15,5 +15,4 @@ class MangaRaw:
     url: str
     next_chapter_url: str
     prev_chapter_url: str
-    length: int
     pics_raw: List[PictureRaw]

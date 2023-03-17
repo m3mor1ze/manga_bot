@@ -1,28 +1,28 @@
-import asyncio
 from typing import Dict
-from configs.config import TELEGRAPH_TOKEN
 from telegraph.aio import Telegraph
 from structures import MangaRaw
 
 
 class TelegraphForManga(Telegraph):
-    def __init__(self, author, access_token=None, domain='telegra.ph'):
+    """
+    Extends Telegraph interface.
+    Provides working with manga using MangaRaw structure
+    """
+    def __init__(self, author, author_url=None, access_token=None, domain='telegra.ph'):
         super().__init__(access_token, domain)
         self.author = author
+        self.author_url = author_url
 
-    # TODO: логика на данном этапе неправильная.
-    #  нужно в статье хранить ссылку на оригинал манги. по ней и проводить сравнение
-    async def get_manga(self, manga: str | MangaRaw) -> Dict | None:
+    async def get_manga(self, name: str) -> Dict | None:
         """
         Finds a manga from existing pages
-        :param manga:
+        :param name:
         :return: url if page exists, else None
         """
         page_list = await self.get_page_list()
         for page in page_list['pages']:
-            if isinstance(manga, str) and page['title'] == manga:
+            if isinstance(name, str) and page['title'] == name:
                 return page
-
         return None
 
     async def post_manga(self, manga_raw: MangaRaw) -> Dict:
@@ -38,18 +38,6 @@ class TelegraphForManga(Telegraph):
             title=manga_raw.name,
             html_content=html,
             author_name=self.author,
+            author_url=self.author_url,
         )
         return page
-
-
-async def example():
-    t = TelegraphForManga(TELEGRAPH_TOKEN)
-    # print(resp)
-    #
-    # print('*' * 20)
-    # resp = await t.get_manga('qwe')
-
-
-
-if __name__ == '__main__':
-    asyncio.run(example())
