@@ -8,6 +8,7 @@ class TelegraphForManga(Telegraph):
     Extends Telegraph interface.
     Provides working with manga using MangaRaw structure
     """
+
     def __init__(self, author, author_url=None, access_token=None, domain='telegra.ph'):
         super().__init__(access_token, domain)
         self.author = author

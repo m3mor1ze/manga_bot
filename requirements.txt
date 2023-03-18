@@ -1,6 +1,5 @@
-aiogram>=2.25.1
-aiohttp>=3.8.4
-bs4>=0.0.1
-beautifulsoup4>=4.11.2
-telegraph>=2.2.0
-httpx
+aiogram~=2.25.1
+aiohttp~=3.8.4
+bs4~=0.0.1
+beautifulsoup4~=4.11.2
+telegraph~=2.2.0

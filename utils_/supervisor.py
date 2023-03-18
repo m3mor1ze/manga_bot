@@ -1,14 +1,14 @@
-from configs.config import *
-from utils.scrapper import MangaScrapper
-from utils.manga_telegraph import TelegraphForManga
+from utils_.scrapper import MangaScrapper
+from utils_.manga_telegraph import TelegraphForManga
+from configs_.config import *
 
 
 class Supervisor:
     def __init__(self):
         self.scrapper = MangaScrapper()
         self.poster = TelegraphForManga(
-            author=TELEGRAPH_AUTHOR,
-            access_token=TELEGRAPH_TOKEN
+            author=TELEGRAPH_AUTHOR(),
+            access_token=TELEGRAPH_TOKEN()
         )
 
     def _parse_url(self, msg):
