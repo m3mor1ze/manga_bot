@@ -16,5 +16,14 @@ async def start(msg: Message):
 @dp.message_handler(content_types=['text'])
 async def text(msg: Message):
     await msg.answer('Принял, жди')
-    manga_tg_url = await supervisor.get_manga(msg)
-    await msg.reply(manga_tg_url)
+    
+    links_set = msg.text
+    msg2 = msg
+    f_set = []
+    f_set = links_set.split("\n")
+    
+    #print(f_set)
+    for i in range(len(links_set)):
+        msg2.text = f_set[i]
+        manga_tg_url = await supervisor.get_manga(msg2)
+        await msg.reply(manga_tg_url)

@@ -23,7 +23,7 @@ class TelegraphForManga(Telegraph):
         page_list = await self.get_page_list()
         for page in page_list['pages']:
             if isinstance(name, str) and page['title'] == name:
-                return page
+                return None
         return None
 
     async def post_manga(self, manga_raw: MangaRaw) -> Dict:
