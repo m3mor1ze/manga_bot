@@ -8,19 +8,20 @@ class MangaScrapper:
     """
     Provides scrapping from mintmanga.live
     """
-
-    __base_url__ = 'https://mintmanga.live'
+    #__base_url__ = 'https://mintmanga.live'
+    __base_url__ = 'https://readmanga.live'
     __headers__ = {
         'User-agent': 'Mozila',
     }
 
-    async def get_manga_name(self, url) -> str:
-        async with aiohttp.ClientSession(self.__base_url__, headers=self.__headers__) as session:
+    async def get_manga_name(self, url, bigurl) -> str: #ok
+        async with aiohttp.ClientSession(bigurl, headers=self.__headers__) as session:
             async with session.get(url) as resp:
                 body = await resp.text()
                 soup = BeautifulSoup(body, 'html.parser')
 
-        name = soup.find('strong', class_='mobile-title').text
+        name = soup.find('strong', class_='mobile-title', recursive=True).text
+        print(name)
         return name
 
     async def get_manga_raw(self, url: str) -> MangaRaw:
@@ -67,7 +68,8 @@ class MangaScrapper:
             url = split[0]
             width = int(split[1])
             height = int(split[2])
-            pic_raw = PictureRaw(width, height, url)
+            url = url.split('?')
+            pic_raw = PictureRaw(width, height, url[0])
             pics.append(pic_raw)
-
+        print(pics)
         return prev_link, next_link, pics
